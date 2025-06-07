@@ -18,7 +18,7 @@
 | 6 | [Задание 6](#6-—-map-object-и-общая-metadata) | ресурсы картой |
 | 7 | [Задание 7](#7-—-terraform-console-—-list--map) | работа в console |
 | 8 | [Задание 8](#8-—-console-—-вложенные-структуры) | list‑comprehension |
-| 9 | [Задание 9](#9-—-nat-gateway-без-публичных-ip) | NAT Gateway |
+| 9 | [Задание 9](#nat-gateway) | NAT Gateway |
 
 ---
 
@@ -112,7 +112,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 ---
 
-## <a name="#9-—-nat-gateway-без-публичных-ip"></a>9 — NAT Gateway (без публичных IP)
+## <a name="#nat-gateway"></a>9 — NAT Gateway (без публичных IP)
 
 * Создан `yandex_vpc_gateway.nat_gw` + `yandex_vpc_route_table.rt_via_nat`.
 * У обоих ВМ `nat = false`, но интернет работает.
