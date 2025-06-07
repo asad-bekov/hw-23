@@ -18,7 +18,7 @@
 | 6 | [Задание 6](#6-—-map-object-и-общая-metadata) | ресурсы картой |
 | 7 | [Задание 7](#7-—-terraform-console-—-list--map) | работа в console |
 | 8 | [Задание 8](#8-—-console-—-вложенные-структуры) | list‑comprehension |
-| 9 | [Задание 9](nat-gateway-без-публичных-ip) | NAT Gateway |
+| 9 | [Задание 9](9-—-nat-gateway-без-публичных-ip) | NAT Gateway |
 
 ---
 
