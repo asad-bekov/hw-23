@@ -106,10 +106,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 ## 8 — Вложенные структуры и list‑comprehension
 
 * Полный `type` описан как `list(map(tuple([string,string])))`.
-* Команда для получения SSH‑команд:
-  ```hcl
-  [for srv in var.test : values(srv)[0][0]]
-  ```
+* Команды для получения ответов
 
 ![console 8](https://github.com/asad-bekov/hw-23/raw/main/img/9.png)
 
@@ -120,12 +117,14 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 * Создан `yandex_vpc_gateway.nat_gw` + `yandex_vpc_route_table.rt_via_nat`.
 * У обоих ВМ `nat = false`, но интернет работает.
 
+![У обоих ВМ `nat = false`](https://github.com/asad-bekov/hw-23/raw/main/img/9.1.png)
+
 | Проверка | ВМ web | ВМ db |
 |---|---|---|
 | `nc -vz 1.1.1.1 443` | *succeeded* | *succeeded* |
-| `curl -I https://netology.ru` | `HTTP/2 200` | `HTTP/2 200` |
+| `curl -I https://netology.ru` | `HTTP/2 302` | `HTTP/2 302` |
 
-![У обоих ВМ `nat = false`](https://github.com/asad-bekov/hw-23/raw/main/img/9.1.png)
+
 ![serial console web](https://github.com/asad-bekov/hw-23/raw/main/img/10.png)
 ![serial console db](https://github.com/asad-bekov/hw-23/raw/main/img/11.png)
 
