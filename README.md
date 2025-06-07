@@ -126,6 +126,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 
 ![serial console web](https://github.com/asad-bekov/hw-23/raw/main/img/10.png)
+
 ![serial console db](https://github.com/asad-bekov/hw-23/raw/main/img/11.png)
 
 > **Важно:** ICMP через NAT‑Gateway не поддерживается — `ping` во внешний
