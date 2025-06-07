@@ -18,11 +18,11 @@
 | 6 | [Задание 6](#6-—-map-object-и-общая-metadata) | ресурсы картой |
 | 7 | [Задание 7](#7-—-terraform-console-—-list--map) | работа в console |
 | 8 | [Задание 8](#8-—-console-—-вложенные-структуры) | list‑comprehension |
-| 9 | [Задание 9](9-—-nat-gateway-без-публичных-ip) | NAT Gateway |
+| 9 | [Задание 9](#9-—-nat-gateway-без-публичных-ip) | NAT Gateway |
 
 ---
 
-## 0 — Чек‑лист перед работой
+## <a name="#0-—-чек-лист-перед-работой"></a>0 — Чек‑лист перед работой
 * **Terraform 1.8.4** установлен
 * **YC CLI 0.146** (обновлён до >0.200 при работе с OS Login)
 * Ключ сервис‑аккаунта: `sa-key.json`
@@ -30,7 +30,7 @@
 
 ---
 
-## 1 — Первый запуск Terraform
+## <a name="#1-—-первый-запуск-terraform"></a>1 — Первый запуск Terraform
 
 ### Скриншоты
 | Описание | Изображение |
@@ -46,7 +46,7 @@
 
 ---
 
-## 2 — Выносим всё в переменные
+## <a name="#2-—-выносить-все-в-переменные"></a>2 — Выносим всё в переменные
 
 * Хардкод заменён на переменные с префиксом `vm_web_...`.
 * План без изменений.
@@ -55,7 +55,7 @@
 
 ---
 
-## 3 — Вторая ВМ и подсеть b
+## <a name="#3-—-вторая-вм-и-подсеть"></a>3 — Вторая ВМ и подсеть b
 
 * Добавлена подсеть **develop‑b (10.0.2.0/24)**.
 * ВМ **develop‑2core‑db** развернута в `ru‑central1‑b`.
@@ -64,7 +64,7 @@
 
 ---
 
-## 4 — Outputs
+## <a name="#4-—-outputs"></a>4 — Outputs
 
 Output `instances_info` показывает IP и FQDN обеих ВМ.
 
@@ -72,7 +72,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 ---
 
-## 5 — Locals
+## <a name="#5-—-locals"></a>5 — Locals
 
 * Имена ВМ формируются локалами: `${var.vpc_name}-${var.vm_*_cores}core-{web|db}`.
 * План без изменений ресурсов.
@@ -81,7 +81,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 ---
 
-## 6 — Map/Object и общая metadata
+## <a name="#6-—-map-object-и-общая-metadata"></a>6 — Map/Object и общая metadata
 
 * Ресурсы ВМ описаны одной картой `var.vms_resources`.
 * Metadata — общий `local.vm_metadata_common`.
@@ -90,7 +90,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 ---
 
-## 7 — Terraform console — list & map
+## <a name="#7-—-terraform-console-—-list--map"></a>7 — Terraform console — list & map
 
 | Команда | Вывод |
 |---|---|
@@ -103,7 +103,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 ---
 
-## 8 — Вложенные структуры и list‑comprehension
+## <a name="#8-—-console-—-вложенные-структуры"></a>8 — Вложенные структуры и list‑comprehension
 
 * Полный `type` описан как `list(map(tuple([string,string])))`.
 * Команды для получения ответов
@@ -112,7 +112,7 @@ Output `instances_info` показывает IP и FQDN обеих ВМ.
 
 ---
 
-## 9 — NAT Gateway (без публичных IP)
+## <a name="#9-—-nat-gateway-без-публичных-ip"></a>9 — NAT Gateway (без публичных IP)
 
 * Создан `yandex_vpc_gateway.nat_gw` + `yandex_vpc_route_table.rt_via_nat`.
 * У обоих ВМ `nat = false`, но интернет работает.
