@@ -7,22 +7,22 @@
 ---
 
 ## Содержание
-| № | Раздел | Кратко |
-|---|--------|--------|
-| 0 | [Чек‑лист](#0-—-чек-лист-перед-работой) | подготовка окружения |
-| 1 | [Задание 1](#1-—-первый-запуск-terraform) | первая ВМ, ssh, ответы |
-| 2 | [Задание 2](#2-—-выносить-все-в-переменные) | переменные и validate |
-| 3 | [Задание 3](#3-—-вторая-вм-и-подсеть) | db‑ВМ, подсеть b |
-| 4 | [Задание 4](#4-—-outputs) | вывод IP/FQDN |
-| 5 | [Задание 5](#5-—-locals) | генерация имён ВМ |
-| 6 | [Задание 6](#6-—-map-object-и-общая-metadata) | ресурсы картой |
-| 7 | [Задание 7](#7-—-terraform-console-—-list--map) | работа в console |
-| 8 | [Задание 8](#8-—-console-—-вложенные-структуры) | list‑comprehension |
-| 9 | [Задание 9](#9-—-nat-gateway-без-публичных-ip) | NAT Gateway |
+
+0. [Задание 0: Чек‑лист перед работой](#Чек-лист)
+1. [Задание 1: Первый запуск Terraform](#задание-1)
+2. [Задание 2: Рефакторинг переменных](#задание-2)
+3. [Задание 3: Вторая ВМ и подсеть b](#задание-3)
+4. [Задание 4: Outputs для ВМ](#задание-4)
+5. [Задание 5: Использование local-переменных](#задание-5)
+6. [Задание 6: Map-переменные для ресурсов](#задание-6)
+7. [Задание 7: Работа с Terraform Console](#задание-7)
+8. [Задание 8: Работа со сложными переменными](#задание-8)
+9. [Задание 9: Настройка NAT Gateway](#задание-9)
 
 ---
 
-## <a name="#0-—-чек-лист-перед-работой"></a>0 — Чек‑лист перед работой
+## <a name="#Чек-лист"></a>0 — Чек‑лист перед работой
+
 * **Terraform 1.8.4** установлен
 * **YC CLI 0.146** (обновлён до >0.200 при работе с OS Login)
 * Ключ сервис‑аккаунта: `sa-key.json`
@@ -30,7 +30,7 @@
 
 ---
 
-## <a name="#1-—-первый-запуск-terraform"></a>1 — Первый запуск Terraform
+## <a name="#задание-1"></a>1 — Первый запуск Terraform
 
 ### Скриншоты
 | Описание | Изображение |
@@ -46,9 +46,11 @@
 
 <details> 
 <summary>
-<code>main.tf</code> (минимум для одной ВМ)</summary>
+<code>main.tf</code> (минимум для одной ВМ)
+</summary>
 
 ```hcl
+
 resource "yandex_vpc_network" "develop" {
   name = "develop"
 }
@@ -90,20 +92,24 @@ resource "yandex_compute_instance" "platform" {
     ssh-keys           = "ubuntu:${var.vms_ssh_root_key}"
   }
 }
+
 ```
 </details>
----
 
-## <a name="#2-—-выносить-все-в-переменные"></a>2 — Выносим всё в переменные
+## <a name="#задание-2"></a>2 — Рефакторинг переменных
 
 * Хардкод заменён на переменные с префиксом `vm_web_...`.
 * План без изменений.
 
 ![terraform plan](https://github.com/asad-bekov/hw-23/raw/main/img/3.png)
 
-<details> <summary><code>variables.tf</code> (фрагмент с web‑переменными)</summary>
+<details> 
+<summary>
+<code>variables.tf</code> (фрагмент с web‑переменными)
+</summary>
 
 ```hcl
+
 variable "vm_web_name" {
   type    = string
   default = "netology-develop-platform-web"
@@ -135,9 +141,11 @@ variable "vm_web_preemptible" {
 }
 
 ```
+
 и изменение в `main.tf`:
 
 ```hcl
+
 name        = var.vm_web_name
 platform_id = var.vm_web_platform_id
 resources {
@@ -150,17 +158,20 @@ scheduling_policy { preemptible = var.vm_web_preemptible }
 ```
 </details>
 
----
-
-## <a name="#3-—-вторая-вм-и-подсеть"></a>3 — Вторая ВМ и подсеть b
+## <a name="#задание-3"></a>3 — Вторая ВМ и подсеть b
 
 * Добавлена подсеть **develop‑b (10.0.2.0/24)**.
 * ВМ **develop‑2core‑db** развернута в `ru‑central1‑b`.
 
 ![apply +2](https://github.com/asad-bekov/hw-23/raw/main/img/4.png)
-<details> <summary>подсеть b</summary>
+
+<details>
+<summary> 
+<code>подсеть b</code>
+</summary>
 
 ```hcl
+
 resource "yandex_vpc_subnet" "develop_ru_central1_b" {
   name           = "develop-b"
   zone           = "ru-central1-b"
@@ -169,8 +180,10 @@ resource "yandex_vpc_subnet" "develop_ru_central1_b" {
 }
 
 ```
-</details> <details> <summary>ВМ db</summary>
+и вторая ВМ db
+
 ```hcl
+
 resource "yandex_compute_instance" "db" {
   name        = var.vm_db_name          # "netology-develop-platform-db"
   platform_id = var.vm_db_platform_id   # "standard-v2"
@@ -195,9 +208,8 @@ resource "yandex_compute_instance" "db" {
 
 ```
 </details>
----
 
-## <a name="#4-—-outputs"></a>4 — Outputs
+## <a name="#задание-4"></a>4 — Outputs для ВМ
 
 Output `instances_info` показывает IP и FQDN обеих ВМ.
 
@@ -220,17 +232,21 @@ output "instances_info" {
 
 ```
 </details>
----
 
-## <a name="#5-—-locals"></a>5 — Locals
+## <a name="#задание-5"></a>5 — Использование local-переменных
 
 * Имена ВМ формируются локалами: `${var.vpc_name}-${var.vm_*_cores}core-{web|db}`.
 * План без изменений ресурсов.
 
 ![output после locals](https://github.com/asad-bekov/hw-23/raw/main/img/6.png)
 
-<details> <summary>output</summary>
+<details> 
+<summary>
+<code>output</code>
+</summary>
+
 ```hcl
+
 variable "vm_web_name" {
   type    = string
   default = "netology-develop-platform-web"
@@ -260,26 +276,33 @@ variable "vm_web_preemptible" {
   type    = bool
   default = true
 }
+
 ```
 и в ресурсах:
 
 ```hcl
+
 name        = local.vm_web_name_local
 description = local.vm_web_description
 
 ```
-</details>
----
 
-## <a name="#6-—-map-object-и-общая-metadata"></a>6 — Map/Object и общая metadata
+</details>
+
+## <a name="#задание-6"></a>6 - Map-переменные для ресурсов
 
 * Ресурсы ВМ описаны одной картой `var.vms_resources`.
 * Metadata — общий `local.vm_metadata_common`.
 
 ![apply 0/0/0](https://github.com/asad-bekov/hw-23/raw/main/img/7.png)
 
-<details> <summary><code>variables.tf</code> (карты)</summary>
+<details> 
+<summary>
+<code>variables.tf</code> (карты)
+</summary>
+
 ```hcl
+
 variable "vms_resources" {
   type = map(object({
     cores         = number
@@ -306,10 +329,12 @@ variable "vms_resources" {
     }
   }
 }
+
 ```
 Использование:
 
 ```hcl
+
 resources {
   cores         = var.vms_resources["web"].cores
   memory        = var.vms_resources["web"].memory
@@ -320,9 +345,8 @@ metadata = local.vm_metadata_common
 
 ```
 </details>
----
 
-## <a name="#7-—-terraform-console-—-list--map"></a>7 — Terraform console — list & map
+## <a name="#задание-7"></a>7 — Работа с Terraform Console
 
 | Команда | Вывод |
 |---|---|
@@ -334,12 +358,17 @@ metadata = local.vm_metadata_common
 ![console 7](https://github.com/asad-bekov/hw-23/raw/main/img/8.png)
 ---
 
-## <a name="#8-—-console-—-вложенные-структуры"></a>8 — Вложенные структуры и list‑comprehension
+## <a name="#задание-8"></a>8 — Работа со сложными переменными
 
 * Полный `type` описан как `list(map(tuple([string,string])))`.
 * Команды для получения ответов
 
 ![console 8](https://github.com/asad-bekov/hw-23/raw/main/img/9.png)
+
+<details> 
+<summary>
+<code>команды</code>
+</summary>
 
 ```hcl
 variable "test" {
@@ -361,7 +390,7 @@ exit
 </details>
 ---
 
-## <a name="#9-—-nat-gateway-без-публичных-ip"></a>9 — NAT Gateway (без публичных IP)
+## <a name="#задание-9"></a>9 — Настройка NAT Gateway (без публичных IP)
 
 * Создан `yandex_vpc_gateway.nat_gw` + `yandex_vpc_route_table.rt_via_nat`.
 * У обоих ВМ `nat = false`, но интернет работает.
@@ -373,7 +402,10 @@ exit
 | `nc -vz 1.1.1.1 443` | *succeeded* | *succeeded* |
 | `curl -I https://netology.ru` | `HTTP/2 302` | `HTTP/2 302` |
 
-<details> <summary><code>nat.tf</code></summary>
+<details> 
+<summary>
+<code>nat.tf</code>
+</summary>
 
 ```hcl
 resource "yandex_vpc_gateway" "nat_gw" {
@@ -391,11 +423,10 @@ resource "yandex_vpc_route_table" "rt_via_nat" {
   }
 }
 
-# в обеих существующих подсетях:
 route_table_id = yandex_vpc_route_table.rt_via_nat.id
 
-# и в NIC ВМ
 nat = false
+
 ```
 </details>
 
