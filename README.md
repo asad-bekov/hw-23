@@ -6,26 +6,22 @@
 
 ---
 
-
 ## Содержание
 
-0. [Чек-лист перед работой](#0---чек-лист-перед-работой)
-1. [Первый запуск Terraform](#1---первый-запуск-terraform)
-2. [Рефакторинг переменных](#2---рефакторинг-переменных)
-3. [Вторая ВМ и подсеть b](#3---вторая-вм-и-подсеть-b)
-4. [Outputs для ВМ](#4---outputs-для-вм)
-5. [Использование local-переменных](#5---использование-local-переменных)
-6. [Map-переменные для ресурсов](#6---map-переменные-для-ресурсов)
-7. [Работа с Terraform Console](#7---работа-с-terraform-console)
-8. [Сложные переменные](#8---сложные-переменные)
-9. [NAT Gateway](#9---nat-gateway)
-
-
----
+0. [Чек-лист перед работой](#чек-лист-перед-работой)
+1. [Первый запуск Terraform](#первый-запуск-terraform)
+2. [Рефакторинг переменных](#рефакторинг-переменных)
+3. [Вторая ВМ и подсеть b](#вторая-вм-и-подсеть-b)
+4. [Outputs для ВМ](#outputs-для-вм)
+5. [Использование local-переменных](#использование-local-переменных)
+6. [Map-переменные для ресурсов](#map-переменные-для-ресурсов)
+7. [Работа с Terraform Console](#работа-с-terraform-console)
+8. [Сложные переменные](#сложные-переменные)
+9. [NAT Gateway](#nat-gateway)
 
 ---
 
-## 0 — Чек‑лист перед работой
+## Чек‑лист перед работой
 
 * **Terraform 1.8.4** установлен
 * **YC CLI 0.146** (обновлён до >0.200 при работе с OS Login)
@@ -34,9 +30,10 @@
 
 ---
 
-## 1 — Первый запуск Terraform
+## Первый запуск Terraform
 
 ### Скриншоты
+
 | Описание | Изображение |
 |---|---|
 | ЛК Yandex Cloud — созданная ВМ | ![VM card](https://github.com/asad-bekov/hw-23/raw/main/img/1.png) |
@@ -100,7 +97,7 @@ resource "yandex_compute_instance" "platform" {
 ```
 </details>
 
-## 2 — Рефакторинг переменных
+## Рефакторинг переменных
 
 * Хардкод заменён на переменные с префиксом `vm_web_...`.
 * План без изменений.
@@ -162,7 +159,7 @@ scheduling_policy { preemptible = var.vm_web_preemptible }
 ```
 </details>
 
-## 3 — Вторая ВМ и подсеть b
+## Вторая ВМ и подсеть b
 
 * Добавлена подсеть **develop‑b (10.0.2.0/24)**.
 * ВМ **develop‑2core‑db** развернута в `ru‑central1‑b`.
@@ -194,14 +191,14 @@ resource "yandex_vpc_subnet" "develop_ru_central1_b" {
 ```hcl
 
 resource "yandex_compute_instance" "db" {
-  name        = var.vm_db_name          # "netology-develop-platform-db"
-  platform_id = var.vm_db_platform_id   # "standard-v2"
-  zone        = var.vm_db_zone          # "ru-central1-b"
+  name        = var.vm_db_name          
+  platform_id = var.vm_db_platform_id   
+  zone        = var.vm_db_zone          
 
   resources {
-    cores         = var.vm_db_cores         # 2
-    memory        = var.vm_db_memory        # 2
-    core_fraction = var.vm_db_core_fraction # 20
+    cores         = var.vm_db_cores         
+    memory        = var.vm_db_memory        
+    core_fraction = var.vm_db_core_fraction 
   }
 
   boot_disk { initialize_params { image_id = data.yandex_compute_image.ubuntu.image_id } }
@@ -218,7 +215,7 @@ resource "yandex_compute_instance" "db" {
 ```
 </details>
 
-## 4 — Outputs для ВМ
+## Outputs для ВМ
 
 Output `instances_info` показывает IP и FQDN обеих ВМ.
 
@@ -242,7 +239,7 @@ output "instances_info" {
 ```
 </details>
 
-## 5 — Использование local-переменных
+## Использование local-переменных
 
 * Имена ВМ формируются локалами: `${var.vpc_name}-${var.vm_*_cores}core-{web|db}`.
 * План без изменений ресурсов.
@@ -298,7 +295,7 @@ description = local.vm_web_description
 
 </details>
 
-## 6 - Map-переменные для ресурсов
+## Map-переменные для ресурсов
 
 * Ресурсы ВМ описаны одной картой `var.vms_resources`.
 * Metadata — общий `local.vm_metadata_common`.
@@ -333,7 +330,7 @@ variable "vms_resources" {
       cores         = 2
       memory        = 2
       core_fraction = 20
-      hdd_size      = 10
+      hdd_size      = 5
       hdd_type      = "network-ssd"
     }
   }
@@ -355,7 +352,7 @@ metadata = local.vm_metadata_common
 ```
 </details>
 
-## 7 — Работа с Terraform Console
+## Работа с Terraform Console
 
 | Команда | Вывод |
 |---|---|
@@ -367,7 +364,7 @@ metadata = local.vm_metadata_common
 ![console 7](https://github.com/asad-bekov/hw-23/raw/main/img/8.png)
 ---
 
-## 8 — Работа со сложными переменными
+## Работа со сложными переменными
 
 * Полный `type` описан как `list(map(tuple([string,string])))`.
 * Команды для получения ответов
@@ -399,7 +396,7 @@ exit
 </details>
 ---
 
-## 9 — Настройка NAT Gateway (без публичных IP)
+## Настройка NAT Gateway (без публичных IP)
 
 * Создан `yandex_vpc_gateway.nat_gw` + `yandex_vpc_route_table.rt_via_nat`.
 * У обоих ВМ `nat = false`, но интернет работает.
